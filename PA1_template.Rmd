@@ -7,15 +7,29 @@ output:
 
 
 ## Loading and preprocessing the data
-
+```{r}
+activityData <- read.csv("activity.csv")
+#lets create a dataframe that only includes valid step values (ie. no NA)
+validData <- activityData[!is.na(activityData$steps),]
+library(data.table)
+DT <- data.table(validData)
+aggregatedByDate <- DT[, sum(steps), by = date]
+aggregatedByInterval <- DT[, sum(steps), by = interval]
+setnames(aggregatedByDate,'V1','steps')
+setnames(aggregatedByInterval,'V1','steps')
+```
 
 
 ## What is mean total number of steps taken per day?
-
+```{r}
+hist(aggregatedByDate$steps)
+mean(aggregatedByDate$steps)
+median(aggregatedByDate$steps)
+```
 
 
 ## What is the average daily activity pattern?
-
+plot(aggregatedByInterval$interval,aggregatedByInterval$steps)
 
 
 ## Imputing missing values
