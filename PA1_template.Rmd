@@ -29,7 +29,9 @@ median(aggregatedByDate$steps)
 
 
 ## What is the average daily activity pattern?
+```{r}
 plot(aggregatedByInterval$interval,aggregatedByInterval$steps)
+````
 
 
 ## Imputing missing values
