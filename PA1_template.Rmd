@@ -32,10 +32,56 @@ median(aggregatedByDate$steps)
 ```{r}
 plot(aggregatedByInterval$interval,aggregatedByInterval$steps)
 ````
-
+### the interval with the most activity is `r aggregatedByInterval[aggregatedByInterval$steps==max(aggregatedByInterval$steps),interval] `
 
 ## Imputing missing values
+### There is a total number of `r sum(is.na(activityData$steps))` missing values in the dataset.
+### The strategy used to fill in a new values for a missing value is as follows:
+1. Set the counter and sum to 0.
+2. Starting with the missing value, work your way backwards until you either find a non-missing value or you reach the very begining of the list. If you find a value, add this value to the sum and increment the counter.
+3. Starting with the missing value, work your way forward until you either find a non-missing value or you reach the end of the list. If you do find a value, intrement the counter and sum.
+4. Take the avarage of the value(s) you have found by dividing the sum by the counter.
+5. Replace the NA value with this value.
+```{r}
+cache=TRUE
+size = nrow(activityData)
+ for(i in 1:size) { 
+     if(is.na(activityData[i,"steps"])) {
+      sum = 0;
+      counter = 0;
+      j = i -1;
+      while(j > 0) {
+        if(!is.na(activityData[j,"steps"])) {
+          sum = activityData[j,"steps"]
+          counter = counter + 1
+          break
+        }
+        j = j -1
+      }
+      j = i + 1
+      while(j < size) {
+         if(!is.na(activityData[j,"steps"])) {
+          sum = activityData[j,"steps"]
+          counter = counter + 1
+          break
+        }
+         j = j + 1
+      }
+      average = sum/counter
+      activityData[i,"steps"] <- average
+     }     
+  }
+````
 
-
+###Now that the NA values have been replaced:
+```{r}
+DT2 <- data.table(activityData)
+aggregatedByDate2 <- DT2[, sum(steps), by = date]
+aggregatedByInterval2 <- DT2[, sum(steps), by = interval]
+setnames(aggregatedByDate2,'V1','steps')
+hist(aggregatedByDate2$steps)
+mean(aggregatedByDate2$steps)
+median(aggregatedByDate2$steps)
+````
 
 ## Are there differences in activity patterns between weekdays and weekends?
